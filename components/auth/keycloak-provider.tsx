@@ -125,7 +125,7 @@ export function KeycloakProvider({ children, initOptions = {} }: KeycloakProvide
       if (refreshed) {
         console.log("Token refreshed")
       }
-      return keycloak.token
+      return keycloak.token || null
     } catch (error) {
       console.error("Failed to refresh token", error)
       logout()

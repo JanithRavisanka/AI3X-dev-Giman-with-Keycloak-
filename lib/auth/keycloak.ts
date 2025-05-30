@@ -2,9 +2,9 @@ import type { KeycloakConfig, KeycloakInitOptions } from "keycloak-js"
 
 // Keycloak configuration
 export const keycloakConfig: KeycloakConfig = {
-  url: process.env.NEXT_PUBLIC_KEYCLOAK_URL || "https://auth.ai3x.tech/auth",
-  realm: process.env.NEXT_PUBLIC_KEYCLOAK_REALM || "ai3x",
-  clientId: process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID || "ai3x-web",
+  url: process.env.NEXT_PUBLIC_KEYCLOAK_URL || "http://localhost:8080",
+  realm: process.env.NEXT_PUBLIC_KEYCLOAK_REALM || "AI3X",
+  clientId: process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID || "ai3x_web",
 }
 
 // Keycloak initialization options

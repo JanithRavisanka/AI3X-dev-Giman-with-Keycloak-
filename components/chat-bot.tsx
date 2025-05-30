@@ -6,6 +6,8 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Send, Maximize2, Minimize2, X, Zap, Eye, Lightbulb, MessageSquare } from "lucide-react"
+import { useAuth } from "@/components/auth/keycloak-provider"
+import { HOST, PORT, APP_ID, THREAD_ID } from "@/lib/utils/chat-config"
 
 export function ChatBot() {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -14,6 +16,7 @@ export function ChatBot() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { token } = useAuth()
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -31,17 +34,30 @@ export function ChatBot() {
     setMessages((prev) => [...prev, { role: "user", content: userMessage }])
     setIsLoading(true)
 
-    // Simulate AI response
-    setTimeout(() => {
+    const endpoint = `http://${HOST}:${PORT}/v1/apps/${APP_ID}/threads/${THREAD_ID}/completions/`
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ message: userMessage }),
+      })
+      const data = await res.json()
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: `Thank you for your message: "${userMessage}". I'm Orion, your AI assistant. I can help you learn about our AI3X platform, services, and capabilities. How can I assist you today?`,
-        },
+        { role: "assistant", content: data.reply },
       ])
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Sorry, there was an error connecting to the chat service." },
+      ])
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
